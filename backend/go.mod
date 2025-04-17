@@ -1,8 +1,9 @@
-module main
+module github.com/luizarnoldch/stream_bot
 
 go 1.24.1
 
 require (
+	github.com/go-deepseek/deepseek v0.8.0
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/joho/godotenv v1.5.1
 	github.com/twilio/twilio-go v1.25.1
