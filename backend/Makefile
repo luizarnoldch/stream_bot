@@ -1,0 +1,2 @@
+ng:
+	./ngrok-local.sh
