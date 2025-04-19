@@ -3,6 +3,7 @@ package config
 type (
 	CONFIG struct {
 		MICRO MICRO
+		ENV string
 	}
 
 	MICRO struct {
@@ -27,6 +28,7 @@ type (
 		USER   string
 		PASS   string
 		SCHEMA string
+		MAX_CONNS int
 	}
 
 	TWILIO struct {

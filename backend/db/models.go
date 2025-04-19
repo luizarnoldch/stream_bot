@@ -8,10 +8,30 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AiConversation struct {
+	ID        int32              `json:"id"`
+	Uuid      pgtype.UUID        `json:"uuid"`
+	Name      string             `json:"name"`
+	UserID    int32              `json:"user_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type AiMessage struct {
+	ID             int32              `json:"id"`
+	Content        string             `json:"content"`
+	Role           string             `json:"role"`
+	ConversationID int32              `json:"conversation_id"`
+	Tokens         pgtype.Int4        `json:"tokens"`
+	FinishReason   pgtype.Text        `json:"finish_reason"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
 type AuthUser struct {
 	ID        int32              `json:"id"`
 	Name      string             `json:"name"`
-	Email     string             `json:"email"`
+	Phone     string             `json:"phone"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }

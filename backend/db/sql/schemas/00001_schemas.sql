@@ -1,5 +1,9 @@
 -- +goose Up
 CREATE    SCHEMA IF NOT EXISTS auth;
 
+CREATE    SCHEMA IF NOT EXISTS ai;
+
 -- +goose Down
 DROP      SCHEMA IF EXISTS auth CASCADE;
+
+DROP      SCHEMA IF EXISTS ai CASCADE;
