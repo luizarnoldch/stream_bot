@@ -2,7 +2,6 @@ package deepseek
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/go-deepseek/deepseek"
@@ -25,7 +24,7 @@ func NewDeepSeekClient(apiKey string) DeepSeekClient {
 	}
 }
 
-func (d *DeepSeekClient) ChatCompletionsRequest(messages []*request.Message) (*response.ChatCompletionsResponse, error) {
+func (d *DeepSeekClient) ChatCompletions(messages []*request.Message) (*response.ChatCompletionsResponse, error) {
 	chatReq := &request.ChatCompletionsRequest{
 		Model:    deepseek.DEEPSEEK_CHAT_MODEL,
 		Stream:   false,
@@ -34,7 +33,7 @@ func (d *DeepSeekClient) ChatCompletionsRequest(messages []*request.Message) (*r
 
 	chatResp, err := d.client.CallChatCompletionsChat(context.Background(), chatReq)
 	if err != nil {
-		fmt.Println("Error =>", err)
+		log.Println("Error =>", err)
 		return &response.ChatCompletionsResponse{}, err
 	}
 	return chatResp, nil

@@ -7,6 +7,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/joho/godotenv v1.5.1
+	github.com/sashabaranov/go-openai v1.38.2
 	github.com/twilio/twilio-go v1.25.1
 )
 

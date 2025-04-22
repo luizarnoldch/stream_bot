@@ -30,6 +30,7 @@ func sanityCheck() {
 		"TWILIO_WHATSAPP_NUMBER",
 
 		"DEEPSEEK_API_KEY",
+		"OPENAI_API_KEY",
 	}
 
 	for _, envVar := range requiredEnvVars {
@@ -97,6 +98,7 @@ func LoadConfig() (*CONFIG, error) {
 				WHATSAPP_NUMBER: os.Getenv("TWILIO_WHATSAPP_NUMBER"),
 			},
 			DEEPSEEK_API_KEY: os.Getenv("DEEPSEEK_API_KEY"),
+			OPENAI_API_KEY:   os.Getenv("OPENAI_API_KEY"),
 		},
 		ENV: os.Getenv("ENV"),
 	}, nil
