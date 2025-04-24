@@ -4,8 +4,8 @@ import (
 	"github.com/luizarnoldch/stream_bot/config"
 	"github.com/luizarnoldch/stream_bot/db"
 
-	"github.com/luizarnoldch/stream_bot/integrations/deepseek"
-	"github.com/luizarnoldch/stream_bot/integrations/openai"
+	deepseek "github.com/luizarnoldch/stream_bot/integrations/deepseek-go"
+	openai "github.com/luizarnoldch/stream_bot/integrations/openai-go"
 	"github.com/luizarnoldch/stream_bot/integrations/twilio"
 )
 

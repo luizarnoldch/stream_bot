@@ -22,12 +22,13 @@ func sanityCheck() {
 		"PSQL_PORT",
 		"PSQL_USER",
 		"PSQL_PASS",
-		"PSQL_SCHEMA",
+		"PSQL_DB",
 		"PSQL_MAX_CONNS",
 
 		"TWILIO_ACCOUNT_SID",
 		"TWILIO_AUTH_TOKEN",
 		"TWILIO_WHATSAPP_NUMBER",
+		"TWILIO_MESSAGING_SERVICE_SID",
 
 		"DEEPSEEK_API_KEY",
 		"OPENAI_API_KEY",
@@ -47,7 +48,7 @@ func (c *CONFIG) GetConnString() string {
 		c.MICRO.DB.PSQL.PASS,
 		c.MICRO.DB.PSQL.HOST,
 		c.MICRO.DB.PSQL.PORT,
-		c.MICRO.DB.PSQL.SCHEMA,
+		c.MICRO.DB.PSQL.DB,
 	)
 
 	// Parámetros adicionales
@@ -88,14 +89,15 @@ func LoadConfig() (*CONFIG, error) {
 					PORT:      os.Getenv("PSQL_PORT"),
 					USER:      os.Getenv("PSQL_USER"),
 					PASS:      os.Getenv("PSQL_PASS"),
-					SCHEMA:    os.Getenv("PSQL_SCHEMA"),
+					DB:        os.Getenv("PSQL_DB"),
 					MAX_CONNS: conns,
 				},
 			},
 			TWILIO: TWILIO{
-				ACCOUNT_SID:     os.Getenv("TWILIO_ACCOUNT_SID"),
-				AUTH_TOKEN:      os.Getenv("TWILIO_AUTH_TOKEN"),
-				WHATSAPP_NUMBER: os.Getenv("TWILIO_WHATSAPP_NUMBER"),
+				ACCOUNT_SID:           os.Getenv("TWILIO_ACCOUNT_SID"),
+				AUTH_TOKEN:            os.Getenv("TWILIO_AUTH_TOKEN"),
+				WHATSAPP_NUMBER:       os.Getenv("TWILIO_WHATSAPP_NUMBER"),
+				MESSAGING_SERVICE_SID: os.Getenv("TWILIO_MESSAGING_SERVICE_SID"),
 			},
 			DEEPSEEK_API_KEY: os.Getenv("DEEPSEEK_API_KEY"),
 			OPENAI_API_KEY:   os.Getenv("OPENAI_API_KEY"),

@@ -35,3 +35,15 @@ type AuthUser struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
+
+type PaymentOperation struct {
+	ID              int32            `json:"id"`
+	Destination     string           `json:"destination"`
+	OperationNumber string           `json:"operation_number"`
+	OperationDate   pgtype.Timestamp `json:"operation_date"`
+	SenderName      pgtype.Text      `json:"sender_name"`
+	AmountSent      pgtype.Numeric   `json:"amount_sent"`
+	Currency        string           `json:"currency"`
+	CreatedAt       pgtype.Timestamp `json:"created_at"`
+	AdditionalNotes pgtype.Text      `json:"additional_notes"`
+}

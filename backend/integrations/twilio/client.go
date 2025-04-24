@@ -8,19 +8,21 @@ import (
 )
 
 type TwilioClient struct {
-	client         *twilio.RestClient
-	whatsappNumber string
+	client              *twilio.RestClient
+	whatsappNumber      string
+	messagingServiceSid string
 }
 
-func NewTwilioClient(twiloAccountSid, twiloAuthToken, whatsappNumber string) TwilioClient {
+func NewTwilioClient(twiloAccountSid, twiloAuthToken, whatsappNumber, messagingServiceSid string) TwilioClient {
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: twiloAccountSid,
 		Password: twiloAuthToken,
 	})
 
 	return TwilioClient{
-		client:         client,
-		whatsappNumber: whatsappNumber,
+		client:              client,
+		whatsappNumber:      whatsappNumber,
+		messagingServiceSid: messagingServiceSid,
 	}
 }
 
@@ -29,6 +31,7 @@ func (t *TwilioClient) SendWhatsAppMessage(to string, body string) (*twilioApi.A
 	params := &twilioApi.CreateMessageParams{}
 	params.SetTo("whatsapp:" + to_normalized)
 	params.SetFrom("whatsapp:" + t.whatsappNumber)
+	params.SetMessagingServiceSid(t.messagingServiceSid)
 	params.SetBody(body)
 
 	resp, err := t.client.Api.CreateMessage(params)

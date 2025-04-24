@@ -11,15 +11,25 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-deepseek/deepseek/request"
+	"github.com/cohesion-org/deepseek-go"
 	"github.com/luizarnoldch/stream_bot/db"
 	"github.com/luizarnoldch/stream_bot/integrations/prompts"
-	"github.com/sashabaranov/go-openai"
+	"github.com/openai/openai-go"
 )
 
 func formatResponse(text string) string {
 	text = strings.ReplaceAll(text, "\n", " ")
 	return strings.ReplaceAll(text, "\r\n", " ")
+}
+
+func formatJSONResponse(response string) string {
+	cleaned := strings.ReplaceAll(response, "`", "")
+	start := strings.Index(cleaned, "{")
+	end := strings.LastIndex(cleaned, "}")
+	if start != -1 && end != -1 && end > start {
+		return strings.TrimSpace(cleaned[start : end+1])
+	}
+	return strings.TrimSpace(cleaned)
 }
 
 func handleUserCreation(ctx context.Context, t *TwilioHandler, phone string, profileName string) (db.AuthUser, db.AiConversation, error) {
@@ -35,51 +45,22 @@ func handleUserCreation(ctx context.Context, t *TwilioHandler, phone string, pro
 		return newUser, db.AiConversation{}, fmt.Errorf("error al crear conversación: %w", err)
 	}
 
-	if _, err = t.app.DB.CreateMessage(ctx, prompts.PROMPT_STREAM_VENTAS_BOT, request.RoleSystem, newConversation.ID); err != nil {
+	if _, err = t.app.DB.CreateMessage(ctx, prompts.PROMPT_STREAM_VENTAS_BOT, deepseek.ChatMessageRoleSystem, newConversation.ID); err != nil {
 		log.Printf("Error creating system message: %v", err)
 	}
 
 	return newUser, newConversation, nil
 }
 
-func buildDeepSeekInput(messages []db.AiMessage) []*request.Message {
-	input := make([]*request.Message, 0, len(messages))
+func buildDeepSeekInput(messages []db.AiMessage) []deepseek.ChatCompletionMessage {
+	input := make([]deepseek.ChatCompletionMessage, 0, len(messages))
 	for _, msg := range messages {
-		input = append(input, &request.Message{
+		input = append(input, deepseek.ChatCompletionMessage{
 			Role:    msg.Role,
 			Content: msg.Content,
 		})
 	}
 	return input
-}
-
-func processTextConversation(ctx context.Context, t *TwilioHandler, msg TwilioWhatsAppMessage, conversation db.AiConversation) (string, error) {
-	_, err := t.app.DB.CreateMessage(ctx, msg.Body, request.RoleUser, int32(conversation.ID))
-	if err != nil {
-		log.Printf("Error saving %s message: %v", request.RoleUser, err)
-		return "", fmt.Errorf("error al guardar mensaje de %s: %w", request.RoleUser, err)
-	}
-
-	messages, err := t.app.DB.ListMessagesByConversation(ctx, conversation.ID)
-	if err != nil {
-		log.Printf("Error getting messages: %v", err)
-		return "", fmt.Errorf("error al obtener mensajes: %w", err)
-	}
-
-	aiResponse, err := t.app.DeepSeek.ChatCompletions(buildDeepSeekInput(messages))
-	if err != nil {
-		log.Printf("Error from DeepSeek: %v", err)
-		return "", fmt.Errorf("error de DeepSeek: %w", err)
-	}
-
-	formattedText := formatResponse(aiResponse.Choices[0].Message.Content)
-	_, err = t.app.DB.CreateMessage(ctx, formattedText, request.RoleSystem, int32(conversation.ID))
-	if err != nil {
-		log.Printf("Error saving %s message: %v", request.RoleUser, err)
-		return "", fmt.Errorf("error al guardar mensaje de %s: %w", request.RoleUser, err)
-	}
-
-	return formattedText, nil
 }
 
 func downloadPNG(t *TwilioHandler, dir, baseName, url string) (string, error) {
@@ -150,21 +131,29 @@ func prepareImageDataURLs(t *TwilioHandler, msg TwilioWhatsAppMessage) ([]string
 }
 
 func processOpenAIDataURLsMessages(ctx context.Context, t *TwilioHandler, text string, dataURLs []string, conv db.AiConversation) (string, error) {
-	var msgs []openai.ChatCompletionMessage
+	var msgs []openai.ChatCompletionMessageParamUnion
 
 	if text != "" {
-		if _, err := t.app.DB.CreateMessage(ctx, text, request.RoleUser, int32(conv.ID)); err != nil {
+		if _, err := t.app.DB.CreateMessage(ctx, text, deepseek.ChatMessageRoleUser, int32(conv.ID)); err != nil {
 			log.Printf("Error guardando texto: %v", err)
 		}
-		msgs = append(msgs, openai.ChatCompletionMessage{Role: openai.ChatMessageRoleUser, Content: text})
+		msgs = append(msgs, openai.UserMessage(text))
 	}
 
 	for _, url := range dataURLs {
-		msgs = append(msgs, openai.ChatCompletionMessage{
-			Role: openai.ChatMessageRoleUser,
-			MultiContent: []openai.ChatMessagePart{
-				{Type: openai.ChatMessagePartTypeText, Text: prompts.PROMPT_STREAM_PAGOS_BOT},
-				{Type: openai.ChatMessagePartTypeImageURL, ImageURL: &openai.ChatMessageImageURL{URL: url, Detail: "low"}},
+		parts := []openai.ChatCompletionContentPartUnionParam{
+			openai.TextContentPart(prompts.PROMPT_STREAM_PAGOS_BOT),
+			openai.ImageContentPart(openai.ChatCompletionContentPartImageImageURLParam{
+				URL:    url,
+				Detail: string(openai.ImageFileDeltaDetailLow),
+			}),
+		}
+
+		msgs = append(msgs, openai.ChatCompletionMessageParamUnion{
+			OfUser: &openai.ChatCompletionUserMessageParam{
+				Content: openai.ChatCompletionUserMessageParamContentUnion{
+					OfArrayOfContentParts: parts,
+				},
 			},
 		})
 	}
@@ -176,7 +165,7 @@ func processOpenAIDataURLsMessages(ctx context.Context, t *TwilioHandler, text s
 	}
 
 	result := formatResponse(response.Choices[0].Message.Content)
-	if _, err := t.app.DB.CreateMessage(ctx, result, request.RoleSystem, int32(conv.ID)); err != nil {
+	if _, err := t.app.DB.CreateMessage(ctx, result, deepseek.ChatMessageRoleSystem, int32(conv.ID)); err != nil {
 		log.Printf("Error guardando respuesta: %v", err)
 		return "", fmt.Errorf("error al guardar mensaje de sistema: %w", err)
 	}

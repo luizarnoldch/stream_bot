@@ -3,6 +3,8 @@ package db
 import (
 	"database/sql"
 	"log"
+
+	_ "github.com/lib/pq" // registra el driver de PostgreSQL
 )
 
 // GetConn sets up and returns a database connection.
@@ -13,8 +15,8 @@ func GetConn(dsn string, maxConns int) *sql.DB {
 		return dbConn
 	}
 
-	dbConn.SetMaxOpenConns(maxConns)     // Maximum number of open connections to the database
-	dbConn.SetMaxIdleConns(maxConns / 2) // Maximum number of idle connections to the database
+	dbConn.SetMaxOpenConns(maxConns)
+	dbConn.SetMaxIdleConns(maxConns / 2)
 
 	return dbConn
 }

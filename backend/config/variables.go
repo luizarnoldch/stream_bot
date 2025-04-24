@@ -3,7 +3,7 @@ package config
 type (
 	CONFIG struct {
 		MICRO MICRO
-		ENV string
+		ENV   string
 	}
 
 	MICRO struct {
@@ -24,11 +24,11 @@ type (
 	}
 
 	PSQL struct {
-		HOST   string
-		PORT   string
-		USER   string
-		PASS   string
-		SCHEMA string
+		HOST      string
+		PORT      string
+		USER      string
+		PASS      string
+		DB        string
 		MAX_CONNS int
 	}
 
@@ -36,5 +36,6 @@ type (
 		ACCOUNT_SID     string
 		AUTH_TOKEN      string
 		WHATSAPP_NUMBER string
+		MESSAGING_SERVICE_SID string
 	}
 )

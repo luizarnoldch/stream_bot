@@ -1,2 +1,0 @@
-1. Migrar a https://github.com/openai/openai-go
-2. Migrar a https://github.com/cohesion-org/deepseek-go

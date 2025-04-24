@@ -10,8 +10,8 @@ import (
 	"github.com/luizarnoldch/stream_bot/db"
 	"github.com/luizarnoldch/stream_bot/types"
 
-	deepseek_service "github.com/luizarnoldch/stream_bot/integrations/deepseek"
-	openai_service "github.com/luizarnoldch/stream_bot/integrations/openai"
+	deepseek_service "github.com/luizarnoldch/stream_bot/integrations/deepseek-go"
+	openai_service "github.com/luizarnoldch/stream_bot/integrations/openai-go"
 	twilio_service "github.com/luizarnoldch/stream_bot/integrations/twilio"
 )
 
@@ -28,6 +28,7 @@ func main() {
 		env.MICRO.TWILIO.ACCOUNT_SID,
 		env.MICRO.TWILIO.AUTH_TOKEN,
 		env.MICRO.TWILIO.WHATSAPP_NUMBER,
+		env.MICRO.TWILIO.MESSAGING_SERVICE_SID,
 	)
 
 	newHttpServer := types.NewHTTPServer(
